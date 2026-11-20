@@ -110,14 +110,20 @@ class DataProcessor:
         print(f"Середня кількість тегів    : {df['Tags_Count'].mean():.2f}")
 
         # Групування за авторами та визначення ТОП-5
-        top_authors = df["Author"].value_counts().head(5)
+        top_authors = df["Author"].value_counts().head(5).rename("Кількість цитат").reset_index()
         print("\n--- ТОП-5 авторів за кількістю цитат ---")
-        print(top_authors.to_string())
+        print(top_authors.to_string(index=False))
 
         # Побудова та збереження стовпчастої діаграми
         chart_path = os.path.join(self.output_dir, chart_filename)
         plt.figure(figsize=(9, 5))
-        bars = plt.bar(top_authors.index, top_authors.values, color="#2E86C1", edgecolor="black", width=0.55)
+        bars = plt.bar(
+            top_authors["Author"], 
+            top_authors["Кількість цитат"], 
+            color="#2E86C1", 
+            edgecolor="black", 
+            width=0.55
+            )
 
         for bar in bars:
             height = bar.get_height()
@@ -138,7 +144,6 @@ class DataProcessor:
         plt.tight_layout()
         plt.savefig(chart_path, dpi=150)
         print(f"\n[УСПІХ] Діаграму збережено у графічний файл: {chart_path}")
-        plt.show()
 
 
 def get_pages_count() -> int:
@@ -176,6 +181,7 @@ def main():
     processor.save_csv()
     processor.save_json()
     print("=" * 60)
+    plt.show()
 
 
 if __name__ == "__main__":
